@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -22,7 +23,11 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -51,8 +56,7 @@ public class App
 	}
 	
 	public static void readToExcel(String path, List<ResultObj> cons) {
-		
-		/*try {
+		try {
 			FileInputStream file = new FileInputStream(new File(path));
 			Workbook workBook = WorkbookFactory.create(file);
 			Sheet sheet = workBook.getSheetAt(0);
@@ -63,13 +67,8 @@ public class App
 				Row row = sheet.createRow(rownum++);
 				int id = con.getId();
 				String title = con.getTitle().toString().trim();
-				String content = con.getContent().toString().trim();
-				String category = con.getCategories().get(0);
-				String image = con.getImage();
-				String type = con.getTypes().get(0);
-				String tag = con.getTags();
-				String status = con.getStatus();
-				int blogNumber = con.getNumberBlog();
+				String image = con.getImg();
+				String swf = con.getSwf();
 				if (row.getRowNum() == 0)
 					continue;
 				if (row.getCell(0) == null) {
@@ -85,13 +84,14 @@ public class App
 				if (row.getCell(2) == null) {
 					row.createCell(2);
 				}
-				row.getCell(2).setCellValue(content);
+				row.getCell(2).setCellValue(image);
 				//
 				if (row.getCell(3) == null) {
 					row.createCell(3);
 				}
-				row.getCell(3).setCellValue(category);
-				//
+				row.getCell(3).setCellValue(swf);
+				
+				/*//
 				if (row.getCell(4) == null) {
 					row.createCell(4);
 				}
@@ -122,7 +122,7 @@ public class App
 				if (row.getCell(10) == null) {
 					row.createCell(10);
 				}
-				row.getCell(10).setCellValue(blogNumber);
+				row.getCell(10).setCellValue(blogNumber);*/
 			}
 			file.close();
 			FileOutputStream output_file = new FileOutputStream(new File(path));
@@ -137,7 +137,49 @@ public class App
 			e.printStackTrace();
 		} catch (InvalidFormatException e) {
 			e.printStackTrace();
-		}*/
+		}
+	}
+	
+	private void saveFileFromUrl(String url, String source) {
+		InputStream inputStream = null;
+		OutputStream outputStream = null;
+		HttpClient client = HttpClientBuilder.create().build();
+		HttpGet getFile = new HttpGet(url);
+		HttpResponse response;
+		try {
+			response = client.execute(getFile);
+			if(response.getEntity().getContent() != null) 
+				inputStream = response.getEntity().getContent();
+			outputStream = new FileOutputStream(new File(source));
+
+			int read = 0;
+			byte[] bytes = new byte[1024];
+
+			while ((read = inputStream.read(bytes)) != -1) {
+				outputStream.write(bytes, 0, read);
+			}
+			System.out.println("Finish download file success.");
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (outputStream != null) {
+				try {
+					outputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+			}
+		}
+		
 	}
 	
 	public static void downloadSource(String path,String menu) throws Exception {
