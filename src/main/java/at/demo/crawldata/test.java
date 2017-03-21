@@ -3,9 +3,22 @@
  */
 package at.demo.crawldata;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.SimpleFormatter;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * @author nambv
@@ -13,10 +26,9 @@ import java.util.logging.SimpleFormatter;
  * Mar 14, 2017
  */
 public class test {
-	public static void main(String args[]) {
-		Date now = new Date();
-		SimpleDateFormat sf = new SimpleDateFormat("dd-MM-yyyy");
-		String dateString = sf.format(now).replace("-", "");
-		System.out.println(dateString);
-	}
+	public static void main(String[] args) 
+    {
+		long a = 26859787;
+		System.out.println(TimeUnit.DAYS.convert(a, TimeUnit.MILLISECONDS));
+    }
 }
