@@ -229,36 +229,45 @@ public class Action {
 			obj.setSwf(nameDataGame);
 			obj.setImg(nameImgSource);
 			obj.setTitle(input.getTitle());
-			//saveFileFromUrl(obj, folder);
-			//downloadSource(obj, folder);
+			saveFileFromUrl(obj, folder);
+			downloadSource(obj, folder);
 			readToExcel(obj,folder);
 			//listObj.add(obj);
 		}
 	}
 	
-	private static void getDataByMenu(String menu,String folder) throws Exception {
+	private static void getDataByMenu(String menu, int pageSize, String dateString) throws Exception {
 		String homeUrl = "http://www.silvergames.com";
-		String menuUrl = homeUrl+"/"+menu;
-		ObjWeb obj;
-        Element body = httpClient(menuUrl);
-        Element catContent = body.getElementById("cat_content");
-        Element listGames = catContent.child(0);
-        Elements games = listGames.select("div>ul");
-        for(int i = 0; i < games.size(); i++) {
-        	obj = new ObjWeb();
-        	String menuGame = games.get(i).select("a").get(0).attr("href");
-        	String titleGame = games.get(i).select("a").get(1).text();
-        	String imgGameLink = games.get(i).select("a").get(0).select("img").attr("src");
-        	String gameUrl = homeUrl+menuGame;
-        	Element bodyMenuGame = httpClient(gameUrl);
-        	obj.setId(String.valueOf(i));
-        	obj.setBody(bodyMenuGame);
-        	obj.setTitle(titleGame);
-        	obj.setImg(imgGameLink);
-        	obj.setMenu(menu);
-        	parseWebsite(obj,folder);
-        	//listObjectWeb.add(obj);
-        }
+		String folder = configPath+dateString+"/"+menu;
+		
+		for(int j = 0; j <= pageSize;j++) {
+			ObjWeb obj;
+			String pageNumber = j == 0 ? "" : "/"+String.valueOf(j);
+			String folderName = folder+"-page"+j;
+			createFolder(folderName);
+			String path = folderName+ "/content.xlsx";
+			initExcelFile(path);
+			String menuUrl = homeUrl+"/"+menu+pageNumber;
+	        Element body = httpClient(menuUrl);
+	        Element catContent = body.getElementById("cat_content");
+	        Element listGames = catContent.child(0);
+	        Elements games = listGames.select("div>ul");
+	        for(int i = 0; i < games.size(); i++) {
+	        	obj = new ObjWeb();
+	        	String menuGame = games.get(i).select("a").get(0).attr("href");
+	        	String titleGame = games.get(i).select("a").get(1).text();
+	        	String imgGameLink = games.get(i).select("a").get(0).select("img").attr("src");
+	        	String gameUrl = homeUrl+menuGame;
+	        	Element bodyMenuGame = httpClient(gameUrl);
+	        	obj.setId(String.valueOf(i));
+	        	obj.setBody(bodyMenuGame);
+	        	obj.setTitle(titleGame);
+	        	obj.setImg(imgGameLink);
+	        	obj.setMenu(menu);
+	        	parseWebsite(obj,folderName);
+	        	//listObjectWeb.add(obj);
+	        }
+		}
       //parseWebsite(listObjectWeb);
 	}
 	
@@ -273,7 +282,7 @@ public class Action {
 		                {"id", "title", "img","swf"}
 		        };
 		        int rowNum = 0;
-		        System.out.println("Creating excel");
+		        System.out.println("Creating excel for first time");
 
 		        for (Object[] datatype : datatypes) {
 		            Row row = sheet.createRow(rowNum++);
@@ -308,19 +317,14 @@ public class Action {
 		System.out.println( "*****Begin find games*****" );
         System.out.println("...running..");
         String [] menu = {"action","racing","shooting","sports","strategy","puzzle","iogames","mmo"};
+        String pageSize = "5";
         Date now = new Date();
 		SimpleDateFormat sf = new SimpleDateFormat("dd-MM-yyyy");
 		String dateString = sf.format(now).replace("-", "");
 		createFolder(configPath+dateString);
 		try {
 			for(int i = 0; i < menu.length; i++) {
-				String folder = configPath+dateString+"/"+menu[i];
-				createFolder(folder);
-				//
-				String path = folder + "/content.xlsx";
-				initExcelFile(path);
-				//
-				getDataByMenu(menu[i],folder);
+				getDataByMenu(menu[i],Integer.parseInt(pageSize),dateString);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
