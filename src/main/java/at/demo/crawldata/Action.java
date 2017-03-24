@@ -46,7 +46,7 @@ import org.jsoup.select.Elements;
 
 public class Action {
 	
-	private static String configPath = "/Users/nambv/Desktop/" ;
+	private static String configPath = "C:/Users/" ;
 	
 	private static void createFolder(String path) {
 		File file = new File(path);
@@ -166,7 +166,6 @@ public class Action {
 			XSSFWorkbook workBook = new XSSFWorkbook(file);
 			XSSFSheet sheet = workBook.getSheetAt(0);
 			int rownum = sheet.getPhysicalNumberOfRows();
-			System.out.println(sheet.getPhysicalNumberOfRows());
 			Row row = sheet.createRow(rownum++);
 			String id = con.getId();
 			String title = con.getTitle().toString().trim();
