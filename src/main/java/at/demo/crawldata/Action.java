@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,19 +18,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jsoup.Jsoup;
@@ -46,7 +41,7 @@ import org.jsoup.select.Elements;
 
 public class Action {
 	
-	private static String configPath = "C:/Users/" ;
+	private static String configPath = "/Users/nambv/Desktop/" ;
 	
 	private static void createFolder(String path) {
 		File file = new File(path);
@@ -97,6 +92,7 @@ public class Action {
 			response = client.execute(getFile);
 			if(response.getEntity().getContent() != null) 
 				inputStream = response.getEntity().getContent();
+			System.out.println(inputStream);
 			outputStream = new FileOutputStream(new File(folder+"/"+nameSource));
 
 			int read = 0;
@@ -174,7 +170,7 @@ public class Action {
 			if (row.getCell(0) == null) {
 				row.createCell(0);
 			}
-			row.getCell(0).setCellValue(id);
+			row.getCell(0).setCellValue(rownum-1);
 			//
 			if (row.getCell(1) == null) {
 				row.createCell(1);
@@ -228,6 +224,7 @@ public class Action {
 			obj.setSwf(nameDataGame);
 			obj.setImg(nameImgSource);
 			obj.setTitle(input.getTitle());
+			System.out.println(linkDataSource);
 			saveFileFromUrl(obj, folder);
 			downloadSource(obj, folder);
 			readToExcel(obj,folder);
@@ -312,7 +309,21 @@ public class Action {
 			}
 	}
 	
-	public static void main(String args[]) {
+	public static String getContentBodyAsString(HttpResponse res) throws IOException 
+	{
+		InputStream is = res.getEntity().getContent();
+		BufferedInputStream bis = new BufferedInputStream(is);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] buff = new byte[1024];
+		for(int l = bis.read(buff); l != -1; l = bis.read(buff))
+		{
+			baos.write(buff, 0, buff.length);
+			buff = new byte[1024];
+		}
+		return new String(baos.toByteArray());
+	}
+	
+	public static void main(String args[]) throws ClientProtocolException, IOException {
 		System.out.println( "*****Begin find games*****" );
         System.out.println("...running..");
         String [] menu = {"action","racing","shooting","sports","strategy","puzzle","iogames","mmo"};
@@ -329,6 +340,7 @@ public class Action {
 			e.printStackTrace();
 		}
     	System.out.println("--------------end------------");
+		
 	}
 
 }
