@@ -46,7 +46,7 @@ import org.jsoup.select.Elements;
 
 public class Action {
 	
-	private static String configPath = "/Users/nambv/Desktop/" ;
+	private static String configPath = "C:/Users/" ;
 	
 	private static void createFolder(String path) {
 		File file = new File(path);
@@ -168,10 +168,11 @@ public class Action {
 			int rownum = sheet.getPhysicalNumberOfRows();
 			System.out.println(sheet.getPhysicalNumberOfRows());
 			Row row = sheet.createRow(rownum++);
-			String id = con.getId();
+			String id = String.valueOf(sheet.getPhysicalNumberOfRows() - 1);
 			String title = con.getTitle().toString().trim();
 			String image = con.getImg();
 			String swf = con.getSwf();
+			String des = con.getDes();
 			if (row.getCell(0) == null) {
 				row.createCell(0);
 			}
@@ -191,6 +192,12 @@ public class Action {
 				row.createCell(3);
 			}
 			row.getCell(3).setCellValue(swf);
+			//
+			//
+			if (row.getCell(4) == null) {
+				row.createCell(4);
+			}
+			row.getCell(4).setCellValue(des);
 			
 		file.close();
 		FileOutputStream output_file = new FileOutputStream(new File(path));
@@ -214,6 +221,10 @@ public class Action {
 		if (body.select("#game>#game_embed") == null || body.select("#game>#game_embed").size() == 0) {
 			return;
 		}
+		String des = "";
+		if(body.select("#footer .desc") != null) {
+			des = body.select("#footer .desc").text();
+		}
 		Element gameEmbed = body.select("#game>#game_embed").get(0);
 		String linkDataSource = gameEmbed.attr("data-src").toString();
 		String linkImgSource = input.getImg();
@@ -229,6 +240,7 @@ public class Action {
 			obj.setSwf(nameDataGame);
 			obj.setImg(nameImgSource);
 			obj.setTitle(input.getTitle());
+			obj.setDes(des);
 			saveFileFromUrl(obj, folder);
 			downloadSource(obj, folder);
 			readToExcel(obj,folder);
@@ -279,7 +291,7 @@ public class Action {
 				XSSFWorkbook workbook = new XSSFWorkbook();
 		        XSSFSheet sheet = workbook.createSheet("Games");
 		        Object[][] datatypes = {
-		                {"id", "title", "img","swf"}
+		                {"id", "title", "img","swf","des"}
 		        };
 		        int rowNum = 0;
 		        System.out.println("Creating excel for first time");
@@ -317,7 +329,7 @@ public class Action {
 		System.out.println( "*****Begin find games*****" );
         System.out.println("...running..");
         String [] menu = {"action","racing","shooting","sports","strategy","puzzle","iogames","mmo"};
-        String pageSize = "5";
+        String pageSize = "1";
         Date now = new Date();
 		SimpleDateFormat sf = new SimpleDateFormat("dd-MM-yyyy");
 		String dateString = sf.format(now).replace("-", "");

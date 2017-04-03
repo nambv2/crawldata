@@ -15,7 +15,34 @@ public class ResultObj {
 	private String swf;
 	private String linkSwf;
 	private String linkImg;
+	private String des;
+	private String cate;
 	
+	
+	/**
+	 * @return the des
+	 */
+	public String getDes() {
+		return des;
+	}
+	/**
+	 * @param des the des to set
+	 */
+	public void setDes(String des) {
+		this.des = des;
+	}
+	/**
+	 * @return the cate
+	 */
+	public String getCate() {
+		return cate;
+	}
+	/**
+	 * @param cate the cate to set
+	 */
+	public void setCate(String cate) {
+		this.cate = cate;
+	}
 	public String getLinkSwf() {
 		return linkSwf;
 	}
